@@ -1,0 +1,184 @@
+补充说明：one-hot encoding（独热编码）
+
+一、one-hot encoding 是什么
+
+one-hot encoding，中文通常叫“独热编码”，是一种把类别型数据转换成数值型数据的方法。
+
+很多机器学习模型只能处理数字，不能直接处理文字。例如在 Bank Marketing 数据集中，有这样的特征：
+
+    job = management
+    marital = married
+    education = tertiary
+
+这些值本身是文字，不能直接参与矩阵乘法：
+
+    X @ weights
+
+所以需要先把它们转换成数字。
+
+
+二、简单例子
+
+假设 job 这个特征只有三种取值：
+
+    management
+    technician
+    blue-collar
+
+one-hot encoding 会把一个 job 特征拆成三个新特征：
+
+    job_management
+    job_technician
+    job_blue-collar
+
+如果某个客户的 job 是 management，那么编码结果是：
+
+    job_management   = 1
+    job_technician   = 0
+    job_blue-collar  = 0
+
+如果某个客户的 job 是 technician，那么编码结果是：
+
+    job_management   = 0
+    job_technician   = 1
+    job_blue-collar  = 0
+
+也就是说，每个样本在这些列中只有对应类别的位置为 1，其余位置为 0。
+
+
+三、为什么不能直接把类别写成 1、2、3
+
+比如把 job 编成：
+
+    management  -> 1
+    technician  -> 2
+    blue-collar -> 3
+
+这样看起来也变成了数字，但会引入错误的大小关系。
+
+模型可能会误以为：
+
+    blue-collar > technician > management
+
+或者认为：
+
+    blue-collar 和 management 的距离比 technician 和 management 更远
+
+但实际上这些职业类别之间没有这种数值大小关系。
+
+one-hot encoding 的好处是：
+
+    只表示“是不是这个类别”，不引入错误的大小顺序。
+
+
+四、为什么这次逻辑回归需要 one-hot encoding
+
+这次使用的是 UCI Bank Marketing 数据集，其中有很多类别特征，例如：
+
+    job
+    marital
+    education
+    default
+    housing
+    loan
+    contact
+    month
+    poutcome
+
+这些列包含文字类别，不能直接用于逻辑回归计算。
+
+逻辑回归的核心计算是：
+
+    z = Xw + b
+
+这里的 X 必须是数值矩阵。如果 X 中有 management、married、may 这样的文字，模型无法完成计算。
+
+所以代码中需要先对这些类别特征做 one-hot encoding。
+
+
+五、为什么编码后特征数量会变多
+
+原始数据里，一个类别特征只占一列。
+
+例如：
+
+    job
+
+但如果 job 有 12 种不同取值，one-hot encoding 后就会变成 12 列：
+
+    job_admin.
+    job_blue-collar
+    job_entrepreneur
+    job_housemaid
+    job_management
+    ...
+
+所以一个类别特征可能会扩展成很多个数值特征。
+
+这就是程序输出中：
+
+    Encoded features: 583
+
+的原因。
+
+原始特征数量并没有那么多，但经过 one-hot encoding 后，类别特征被展开成了很多 0/1 特征。
+
+
+六、和之前线性回归代码的区别
+
+之前的线性回归代码使用的是 UCI Wine Quality 数据集。
+
+该数据集里的特征基本都是数值型，例如：
+
+    fixed acidity
+    volatile acidity
+    citric acid
+    residual sugar
+    chlorides
+    alcohol
+
+这些数据本来就可以直接参与数学计算，所以之前线性回归代码不需要 one-hot encoding。
+
+之前线性回归主要做的是：
+
+    读取数据；
+    划分训练集和测试集；
+    标准化数值特征；
+    添加 bias column；
+    梯度下降训练。
+
+而这次逻辑回归除了这些步骤之外，还需要额外处理类别特征：
+
+    将文字类别转换成 one-hot 数值特征。
+
+
+七、one-hot encoding 的优点
+
+    1. 可以把文字类别转换成模型能处理的数字；
+    2. 不会人为制造类别之间的大小顺序；
+    3. 适合逻辑回归、线性回归、神经网络等需要数值输入的模型；
+    4. 结果直观，每一列表示“是否属于某个类别”。
+
+
+八、one-hot encoding 的缺点
+
+    1. 如果类别很多，特征数量会明显增加；
+    2. 特征数量增加后，模型训练可能变慢；
+    3. 如果某些类别很少出现，对模型帮助可能有限；
+    4. 可能导致高维稀疏数据。
+
+因此，当类别特别多时，实际项目中也可能使用其他编码方式，比如 label encoding、target encoding 或 embedding。
+
+
+九、总结
+
+one-hot encoding 的核心作用是：
+
+    把类别型文字数据转换成一组 0/1 数值特征。
+
+在这次逻辑回归作业中，Bank Marketing 数据集包含大量文字类别特征，所以必须先使用 one-hot encoding，才能把数据送入逻辑回归模型中计算。
+
+它和标准化不同：
+
+    标准化处理的是数值特征；
+    one-hot encoding 处理的是类别特征。

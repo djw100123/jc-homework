@@ -1,0 +1,19 @@
+# Local dataset files
+bank-full.csv
+bank-full整理版.csv
+bank+marketing.zip
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
